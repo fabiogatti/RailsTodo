@@ -1,0 +1,76 @@
+<title>Shared Todo App </title>
+<div class="container">
+  <div class="row">
+    <div class="span4">
+      <h1>Shared Todo App</h1>
+      <hr>
+      <div class="form-group">
+			<%= form_for @new_todo, :url => { :action => "create" }  do |f|  %>
+        <p><%= @type %> your item's name</p>
+    		  <%= f.text_field  :todo_item, class: "form-control" %>
+        <br>
+        <p><%= @type %> your item's due date</p>
+          <%= f.date_field  :todo_date, class: "form-control" %>
+        <br>
+        <% if  @nombre == "Save" %>
+          <%= f.hidden_field :id , :value => @new_todo.id %>
+          <%= f.submit "Back", class: "btn btn-primary", name: 'back' %>
+        <% else %>
+          <%= f.hidden_field :id , :value => -1 %>
+        <% end %>
+    		<%= f.submit @nombre, class: "btn btn-success", name: 'submit' %>
+ 			<%end%>
+      </div>
+      <br>
+      	<% if flash[:error] != nil %>
+    		<div class="alert alert-danger">
+      		<button type="button" class="close" data-dismiss="alert">×</button>
+      		<strong><%= flash[:error] %></strong>
+    		</div>
+    		<% end %>
+    	<% if flash[:success] != nil %>
+   			<div class="alert alert-success">
+   			<button type="button" class="close" data-dismiss="alert">×</button>
+      		<strong><%= flash[:success] %></strong>
+   			</div>
+      <% end %>
+      <% if flash[:warning] != nil %>
+        <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+          <strong><%= flash[:warning] %></strong>
+        </div>
+			<% end %>
+      <p>All your todos here</p>
+      <div class="well">
+        <%= form_tag("/todos/complete/", :method => "post") do %>
+        <ul style="list-style-type:none;">
+        <% @todo_items.each do |t| %> 
+          <% if t.completed == true %>
+            <li style="color:grey;"> <%= check_box_tag  "todos_checkbox[]",t.id %>  <strike><%= t.todo_item %></strike>
+             &nbsp|&nbsp <%= link_to "Destroy", delete_path(:id => t.id),:method => :delete, data: {confirm: "¿Are you sure?"} %>
+            </li>
+          <% else %>
+            <% if t.todo_date && Date.today>t.todo_date %>
+              <li style="color:red"> <%= check_box_tag  "todos_checkbox[]",t.id %> <%= t.todo_item %> &nbsp|&nbsp <%= t.todo_date %>
+                &nbsp|&nbsp <%= link_to "Edit", edit_path(:id => t.id),:method => :post %> 
+              </li>
+            <% else %>
+              <li> <%= check_box_tag  "todos_checkbox[]",t.id %> <%= t.todo_item %> 
+                <% if t.todo_date %>
+                  &nbsp|&nbsp <%= t.todo_date %>
+                <% end %>
+                &nbsp|&nbsp <%= link_to "Edit", edit_path(:id => t.id),:method => :post %> 
+              </li>
+            <% end %>
+          <% end %>
+        <% end %>
+        </ul>
+        <% if @todo_items.count > 0 %>
+          <%= submit_tag("Toggle", :class=>"btn btn-primary", :name => 'toggle') %>
+          <%= submit_tag("Delete", :class=>"btn btn-danger", :name => 'delete', data: {confirm: "¿Are you sure?"}) %>
+        <% end %>
+      <%end %>
+      </div> <!-- well -->
+    </div> <!-- span4 -->
+  </div> <!-- row -->
+</div> <!-- container -->
